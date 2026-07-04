@@ -301,6 +301,8 @@ private Q_SLOTS:
     void slotAutoScroll();
     // activated by the dragScroll timer
     void slotDragScroll();
+    // activated by the middleClickAutoscroll timer
+    void slotMiddleClickAutoscroll();
     // show the welcome message
     void slotShowWelcome();
     // activated by left click timer

@@ -227,6 +227,12 @@ public:
     QPoint dragScrollVector;
     QTimer dragScrollTimer;
 
+    // middle click autoscroll
+    bool scrollWithMiddleMouseButton = false;
+    QTimer *middleClickAutoscrollTimer = nullptr;
+    QPoint middleClickAutoscrollOrigin;
+    bool middleClickAutoscrollWasDragged = false;
+
     // left click depress
     QTimer leftClickTimer;
 
@@ -2291,24 +2297,11 @@ void PageView::mouseMoveEvent(QMouseEvent *e)
         return;
     }
 
-    // if holding mouse mid button, perform zoom
-    if (e->buttons() & Qt::MiddleButton) {
-        int deltaY = d->mouseMidLastY - e->globalPosition().y();
-        d->mouseMidLastY = e->globalPosition().y();
-
-        const float upperZoomLimit = d->document->supportsTiles() ? 99.99 : 3.99;
-
-        // Wrap mouse cursor
-        if (Okular::Settings::dragBeyondScreenEdges()) {
-            Qt::Edges wrapEdges;
-            wrapEdges.setFlag(Qt::TopEdge, d->zoomFactor < upperZoomLimit);
-            wrapEdges.setFlag(Qt::BottomEdge, d->zoomFactor > 0.101);
-
-            deltaY += CursorWrapHelper::wrapCursor(e->globalPosition().toPoint(), wrapEdges).y();
+    // if in autoscroll mode, handle dragging
+    if (d->scrollWithMiddleMouseButton) {
+        if ((e->globalPosition().toPoint() - d->middleClickAutoscrollOrigin).manhattanLength() > QApplication::startDragDistance()) {
+            d->middleClickAutoscrollWasDragged = true;
         }
-
-        // update zoom level, perform zoom and redraw
-        continuousZoom(deltaY);
         return;
     }
 
@@ -2430,11 +2423,25 @@ void PageView::mousePressEvent(QMouseEvent *e)
         d->autoScrollTimer->stop();
     }
 
-    // if pressing mid mouse button while not doing other things, begin 'continuous zoom' mode
+    // check if we are already autoscrolling, if so stop it and consume click
+    if (d->scrollWithMiddleMouseButton) {
+        d->scrollWithMiddleMouseButton = false;
+        d->middleClickAutoscrollTimer->stop();
+        updateCursor();
+        return;
+    }
+
+    // if pressing mid mouse button while not doing other things, begin 'autoscroll' mode
     if (e->button() == Qt::MiddleButton) {
-        d->mouseMidLastY = e->globalPosition().y();
-        setCursor(Qt::SizeVerCursor);
-        CursorWrapHelper::startDrag();
+        d->scrollWithMiddleMouseButton = true;
+        d->middleClickAutoscrollWasDragged = false;
+        d->middleClickAutoscrollOrigin = e->globalPosition().toPoint();
+        setCursor(Qt::SizeAllCursor);
+        if (!d->middleClickAutoscrollTimer) {
+            d->middleClickAutoscrollTimer = new QTimer(this);
+            connect(d->middleClickAutoscrollTimer, &QTimer::timeout, this, &PageView::slotMiddleClickAutoscroll);
+        }
+        d->middleClickAutoscrollTimer->start(1000 / 60); // 60 fps
         return;
     }
 
@@ -2674,9 +2681,16 @@ void PageView::mouseReleaseEvent(QMouseEvent *e)
 
     const QPoint eventPos = contentAreaPoint(e->pos());
 
-    // handle mode independent mid bottom zoom
+    // handle mode independent mid button release
     if (e->button() == Qt::MiddleButton) {
-        continuousZoomEnd();
+        if (d->scrollWithMiddleMouseButton) {
+            // if we dragged, stop autoscroll
+            if (d->middleClickAutoscrollWasDragged) {
+                d->scrollWithMiddleMouseButton = false;
+                d->middleClickAutoscrollTimer->stop();
+                updateCursor();
+            }
+        }
         return;
     }
 
@@ -5165,6 +5179,30 @@ void PageView::slotDragScroll()
     scrollTo(horizontalScrollBar()->value() + d->dragScrollVector.x(), verticalScrollBar()->value() + d->dragScrollVector.y());
     QPoint p = contentAreaPosition() + viewport()->mapFromGlobal(QCursor::pos());
     updateSelection(p);
+}
+
+void PageView::slotMiddleClickAutoscroll()
+{
+    if (!d->scrollWithMiddleMouseButton) return;
+
+    QPoint delta = QCursor::pos() - d->middleClickAutoscrollOrigin;
+
+    // add some deadzone and scaling factor
+    int dx = 0;
+    int dy = 0;
+    const int deadzone = 10;
+    const int scale = 10;
+
+    if (abs(delta.x()) > deadzone) {
+        dx = (delta.x() > 0 ? delta.x() - deadzone : delta.x() + deadzone) / scale;
+    }
+    if (abs(delta.y()) > deadzone) {
+        dy = (delta.y() > 0 ? delta.y() - deadzone : delta.y() + deadzone) / scale;
+    }
+
+    if (dx != 0 || dy != 0) {
+        scrollTo(horizontalScrollBar()->value() + dx, verticalScrollBar()->value() + dy);
+    }
 }
 
 void PageView::slotShowWelcome()
