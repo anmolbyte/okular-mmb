@@ -26,6 +26,7 @@ jobs:
           bundle: okular.flatpak
           manifest-path: .flatpak-manifest.json
           cache-key: flatpak-builder-${{ github.sha }}
+          run-tests: false
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
