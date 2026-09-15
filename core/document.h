@@ -789,6 +789,12 @@ public:
     void processDocumentAction(const Action *action, DocumentAdditionalActionType type);
 
     /**
+     * Returns the list of documentAdditionalActionType available for this document
+     * @since 26.08
+     */
+    QList<DocumentAdditionalActionType> documentAdditionalActionTypes() const;
+
+    /**
      * Recalculates all the form fields in the document
      *
      * @since 24.12
@@ -887,7 +893,7 @@ public:
     /**
      * Returns the number of generators that have a configuration widget.
      */
-    int configurableGenerators() const;
+    OKULARCORE_DEPRECATED int configurableGenerators() const;
 
     /**
      * Returns the list with the supported MIME types.
@@ -985,7 +991,7 @@ public:
      *
      * @since 0.7 (KDE 4.1)
      */
-    bool saveChanges(const QString &fileName);
+    OKULARCORE_DEPRECATED bool saveChanges(const QString &fileName);
 
     /**
      * Save the document and the optional changes to it to the specified

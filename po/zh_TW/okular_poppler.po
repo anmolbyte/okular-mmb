@@ -7,20 +7,20 @@
 # Franklin Weng <franklin at goodhorse dot idv dot tw>, 2007, 2008.
 # Franklin Weng <franklin@goodhorse.idv.tw>, 2012, 2013.
 # pan93412 <pan93412@gmail.com>, 2018, 2019.
-# SPDX-FileCopyrightText: 2023, 2025 Kisaragi Hiu <mail@kisaragi-hiu.com>
+# SPDX-FileCopyrightText: 2023, 2025-2026 Kisaragi Hiu <mail@kisaragi-hiu.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: okular_poppler\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2026-07-02 00:42+0000\n"
-"PO-Revision-Date: 2025-08-29 23:17+0900\n"
+"POT-Creation-Date: 2026-09-03 00:41+0000\n"
+"PO-Revision-Date: 2026-07-22 01:10+0900\n"
 "Last-Translator: Kisaragi Hiu <mail@kisaragi-hiu.com>\n"
 "Language-Team: Traditional Chinese <zh-l10n@lists.slat.org>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 25.11.70\n"
+"X-Generator: Lokalize 26.11.70\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #, kde-format
@@ -32,6 +32,22 @@ msgstr "Frank Weng (a.k.a. Franklin), Kisaragi Hiu"
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
 msgstr "franklin@goodhorse.idv.tw, mail@kisaragi-hiu.com"
+
+#: annots.cpp:587 formfields.cpp:535 generator_pdf.cpp:2183
+#: generator_pdf.cpp:2211
+#, kde-format
+msgid "Failed writing temporary file"
+msgstr "寫入暫存檔失敗"
+
+#: annots.cpp:603 formfields.cpp:557 generator_pdf.cpp:2234
+#, kde-format
+msgid "Failed removing file"
+msgstr "移除檔案失敗"
+
+#: annots.cpp:607
+#, kde-format
+msgid "Failed renaming temporary file"
+msgstr "重新命名暫存檔失敗"
 
 #. i18n: ectx: property (text), widget (QLabel, label_3)
 #: conf/pdfsettingswidget.ui:19
@@ -175,6 +191,13 @@ msgstr "可用的憑證"
 msgid "&Load Signatures"
 msgstr "載入簽章(&L)"
 
+#: formfields.cpp:561 generator_pdf.cpp:2238
+#, fuzzy, kde-format
+#| msgid "Failed renaming temporary file: %1"
+msgctxt "%1 is an error message"
+msgid "Failed renaming temporary file: %1"
+msgstr "重新命名暫存檔失敗：%1"
+
 #: generator_pdf.cpp:85
 #, kde-format
 msgid "PDF Options"
@@ -301,24 +324,14 @@ msgstr "PDF"
 msgid "PDF Backend Configuration"
 msgstr "PDF 後端介面設定"
 
-#: generator_pdf.cpp:2183 generator_pdf.cpp:2211
-#, kde-format
-msgid "Failed writing temporary file"
-msgstr "寫入暫存檔失敗"
-
-#: generator_pdf.cpp:2233
-#, kde-format
-msgid "Failed renaming temporary file"
-msgstr "重新命名暫存檔失敗"
-
-#: generator_pdf.cpp:2253
+#: generator_pdf.cpp:2258
 #, kde-format
 msgid ""
 "Some errors were found in the document, Okular might not be able to show the "
 "content correctly"
 msgstr "文件中發現了一些錯誤，Okular 可能無法正確顯示其內容"
 
-#: pdfsettingswidget.cpp:115
+#: pdfsettingswidget.cpp:116
 #, kde-format
 msgctxt "@info Kind of a notice/warning"
 msgid ""
@@ -326,30 +339,36 @@ msgid ""
 "based backend activated"
 msgstr "這些簽章只能在有啟用 GnuPG 後端的現代 Okular 之間作用"
 
-#: pdfsettingswidget.cpp:116
+#: pdfsettingswidget.cpp:117
 #, kde-format
 msgctxt "@title:dialog"
 msgid "Enable PGP Signatures"
 msgstr "啟用 PGP 簽章"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgctxt "Name of the person to whom the cerficate was issued"
 msgid "Issued to"
 msgstr "簽發給"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgid "E-mail"
 msgstr "電子郵件"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgctxt "Certificate expiration date"
 msgid "Expiration date"
 msgstr "有效日期"
 
-#: pdfsettingswidget.cpp:163
+#: pdfsettingswidget.cpp:152
+#, kde-format
+msgctxt "@button"
+msgid "List certificates"
+msgstr "列出憑證"
+
+#: pdfsettingswidget.cpp:174
 #, kde-format
 msgid ""
 "You are using a Poppler library built without NSS support.\n"
@@ -358,31 +377,33 @@ msgstr ""
 "您正使用建置時未包含 NSS 支援的 Poppler 函式庫。\n"
 "由於此原因，加入數位簽章功能不可使用"
 
-#: pdfsettingswidget.cpp:187
+#: pdfsettingswidget.cpp:198
 #, kde-format
 msgctxt "certificate end validity"
 msgid "forever"
 msgstr "永久"
 
-#: pdfsettingswidget.cpp:211
+#: pdfsettingswidget.cpp:222
 #, kde-format
 msgid "Restart needed"
 msgstr "需要重新啟動"
 
-#: pdfsettingswidget.cpp:211
+#: pdfsettingswidget.cpp:222
 #, kde-format
 msgid "You need to restart Okular after changing the NSS directory settings"
 msgstr "修改 NSS 目錄設定後您需要重新啟動 Okular"
 
-#: pdfsignatureutils.cpp:234
-#, kde-format
-msgid "Enter Password"
-msgstr "輸入密碼"
-
-#: pdfsignatureutils.cpp:234
-#, kde-format
-msgid "Enter password to open %1:"
+#: pdfsignatureutils.cpp:236
+#, fuzzy, kde-format
+#| msgid "Enter password to open %1:"
+msgid "Enter password to open: %1"
 msgstr "輸入密碼以開啟 %1："
+
+#~ msgid "Enter Password"
+#~ msgstr "輸入密碼"
+
+#~ msgid "Failed renaming temporary file %1:"
+#~ msgstr "重新命名暫存檔 %1 失敗："
 
 #~ msgid "Not Available"
 #~ msgstr "尚不能用"

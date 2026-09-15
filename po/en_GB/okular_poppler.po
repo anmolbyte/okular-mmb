@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: okular_poppler\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2026-07-02 00:42+0000\n"
+"POT-Creation-Date: 2026-09-03 00:41+0000\n"
 "PO-Revision-Date: 2024-05-21 19:34+0100\n"
 "Last-Translator: Steve Allewell <steve.allewell@gmail.com>\n"
 "Language-Team: British English\n"
@@ -29,6 +29,22 @@ msgstr "Malcolm Hunter, Steve Allewell"
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
 msgstr "malcolm.hunter@gmx.co.uk, steve.allewell@gmail.com"
+
+#: annots.cpp:587 formfields.cpp:535 generator_pdf.cpp:2183
+#: generator_pdf.cpp:2211
+#, kde-format
+msgid "Failed writing temporary file"
+msgstr ""
+
+#: annots.cpp:603 formfields.cpp:557 generator_pdf.cpp:2234
+#, kde-format
+msgid "Failed removing file"
+msgstr ""
+
+#: annots.cpp:607
+#, kde-format
+msgid "Failed renaming temporary file"
+msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, label_3)
 #: conf/pdfsettingswidget.ui:19
@@ -175,6 +191,12 @@ msgstr "Available Certificates"
 msgid "&Load Signatures"
 msgstr "&Load Signatures"
 
+#: formfields.cpp:561 generator_pdf.cpp:2238
+#, kde-format
+msgctxt "%1 is an error message"
+msgid "Failed renaming temporary file: %1"
+msgstr ""
+
 #: generator_pdf.cpp:85
 #, kde-format
 msgid "PDF Options"
@@ -303,17 +325,7 @@ msgstr "PDF"
 msgid "PDF Backend Configuration"
 msgstr "PDF Backend Configuration"
 
-#: generator_pdf.cpp:2183 generator_pdf.cpp:2211
-#, kde-format
-msgid "Failed writing temporary file"
-msgstr ""
-
-#: generator_pdf.cpp:2233
-#, kde-format
-msgid "Failed renaming temporary file"
-msgstr ""
-
-#: generator_pdf.cpp:2253
+#: generator_pdf.cpp:2258
 #, kde-format
 msgid ""
 "Some errors were found in the document, Okular might not be able to show the "
@@ -322,7 +334,7 @@ msgstr ""
 "Some errors were found in the document, Okular might not be able to show the "
 "content correctly"
 
-#: pdfsettingswidget.cpp:115
+#: pdfsettingswidget.cpp:116
 #, kde-format
 msgctxt "@info Kind of a notice/warning"
 msgid ""
@@ -330,31 +342,38 @@ msgid ""
 "based backend activated"
 msgstr ""
 
-#: pdfsettingswidget.cpp:116
+#: pdfsettingswidget.cpp:117
 #, fuzzy, kde-format
 #| msgid "&Load Signatures"
 msgctxt "@title:dialog"
 msgid "Enable PGP Signatures"
 msgstr "&Load Signatures"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgctxt "Name of the person to whom the cerficate was issued"
 msgid "Issued to"
 msgstr "Issued to"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgid "E-mail"
 msgstr "E-mail"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgctxt "Certificate expiration date"
 msgid "Expiration date"
 msgstr "Expiration date"
 
-#: pdfsettingswidget.cpp:163
+#: pdfsettingswidget.cpp:152
+#, fuzzy, kde-format
+#| msgid "PDF Certificates"
+msgctxt "@button"
+msgid "List certificates"
+msgstr "PDF Certificates"
+
+#: pdfsettingswidget.cpp:174
 #, kde-format
 msgid ""
 "You are using a Poppler library built without NSS support.\n"
@@ -363,37 +382,33 @@ msgstr ""
 "You are using a Poppler library built without NSS support.\n"
 "Adding Digital Signatures isn't available for that reason"
 
-#: pdfsettingswidget.cpp:187
+#: pdfsettingswidget.cpp:198
 #, kde-format
 msgctxt "certificate end validity"
 msgid "forever"
 msgstr ""
 
-#: pdfsettingswidget.cpp:211
+#: pdfsettingswidget.cpp:222
 #, kde-format
 msgid "Restart needed"
 msgstr "Restart needed"
 
-#: pdfsettingswidget.cpp:211
+#: pdfsettingswidget.cpp:222
 #, kde-format
 msgid "You need to restart Okular after changing the NSS directory settings"
 msgstr "You need to restart Okular after changing the NSS directory settings"
 
-#: pdfsignatureutils.cpp:234
-#, kde-format
-msgid "Enter Password"
-msgstr "Enter Password"
-
-#: pdfsignatureutils.cpp:234
-#, kde-format
-msgid "Enter password to open %1:"
+#: pdfsignatureutils.cpp:236
+#, fuzzy, kde-format
+#| msgid "Enter password to open %1:"
+msgid "Enter password to open: %1"
 msgstr "Enter password to open %1:"
+
+#~ msgid "Enter Password"
+#~ msgstr "Enter Password"
 
 #~ msgid "Not Available"
 #~ msgstr "Not Available"
-
-#~ msgid "PDF Certificates"
-#~ msgstr "PDF Certificates"
 
 #~ msgid "PDF Digital Signature Certificates"
 #~ msgstr "PDF Digital Signature Certificates"

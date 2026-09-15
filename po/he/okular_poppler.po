@@ -1,13 +1,13 @@
 # Copyright (C) 2024 This file is copyright:
 # This file is distributed under the same license as the okular package.
 #
-# SPDX-FileCopyrightText: 2024, 2025 Yaron Shahrabani <sh.yaron@gmail.com>
+# SPDX-FileCopyrightText: 2024-2026 Yaron Shahrabani <sh.yaron@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: okular\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2026-07-02 00:42+0000\n"
-"PO-Revision-Date: 2025-07-11 10:02+0300\n"
+"POT-Creation-Date: 2026-09-03 00:41+0000\n"
+"PO-Revision-Date: 2026-08-18 09:49+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && "
 "n % 10 == 0) ? 2 : 3));\n"
-"X-Generator: Lokalize 25.04.3\n"
+"X-Generator: Lokalize 26.04.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -27,6 +27,22 @@ msgstr "צוות התרגום של KDE ישראל"
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
 msgstr "kde-l10n-he@kde.org"
+
+#: annots.cpp:587 formfields.cpp:535 generator_pdf.cpp:2183
+#: generator_pdf.cpp:2211
+#, kde-format
+msgid "Failed writing temporary file"
+msgstr "הכתיבה לקובץ הזמני נכשלה"
+
+#: annots.cpp:603 formfields.cpp:557 generator_pdf.cpp:2234
+#, kde-format
+msgid "Failed removing file"
+msgstr "הסרת הקובץ נכשלה"
+
+#: annots.cpp:607
+#, kde-format
+msgid "Failed renaming temporary file"
+msgstr "שינוי שם הקובץ הזמני נכשל"
 
 #. i18n: ectx: property (text), widget (QLabel, label_3)
 #: conf/pdfsettingswidget.ui:19
@@ -172,6 +188,12 @@ msgstr "אישורים זמינים"
 msgid "&Load Signatures"
 msgstr "&טעינת חתימות"
 
+#: formfields.cpp:561 generator_pdf.cpp:2238
+#, kde-format
+msgctxt "%1 is an error message"
+msgid "Failed renaming temporary file: %1"
+msgstr "שינוי שם הקובץ הזמני נכשל: %1"
+
 #: generator_pdf.cpp:85
 #, kde-format
 msgid "PDF Options"
@@ -298,17 +320,7 @@ msgstr "PDF"
 msgid "PDF Backend Configuration"
 msgstr "הגדרות מנגנון PDF"
 
-#: generator_pdf.cpp:2183 generator_pdf.cpp:2211
-#, kde-format
-msgid "Failed writing temporary file"
-msgstr "הכתיבה לקובץ הזמני נכשלה"
-
-#: generator_pdf.cpp:2233
-#, kde-format
-msgid "Failed renaming temporary file"
-msgstr "שינוי שם הקובץ הזמני נכשל"
-
-#: generator_pdf.cpp:2253
+#: generator_pdf.cpp:2258
 #, kde-format
 msgid ""
 "Some errors were found in the document, Okular might not be able to show the "
@@ -316,7 +328,7 @@ msgid ""
 msgstr ""
 "נמצאו כל מיני שגיאות במסמך, יכול להיות ש־Okular לא יוכל להציג את התוכן כראוי"
 
-#: pdfsettingswidget.cpp:115
+#: pdfsettingswidget.cpp:116
 #, kde-format
 msgctxt "@info Kind of a notice/warning"
 msgid ""
@@ -326,30 +338,36 @@ msgstr ""
 "החתימות האלה עובדות רק בין גרסאות עדכניות של Okular עם מנגנון מבוסס GnuPG "
 "פעיל"
 
-#: pdfsettingswidget.cpp:116
+#: pdfsettingswidget.cpp:117
 #, kde-format
 msgctxt "@title:dialog"
 msgid "Enable PGP Signatures"
 msgstr "הפעלת חתימות PGP"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgctxt "Name of the person to whom the cerficate was issued"
 msgid "Issued to"
 msgstr "הונפק לטובת"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgid "E-mail"
 msgstr "דוא״ל"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgctxt "Certificate expiration date"
 msgid "Expiration date"
 msgstr "תאריך תפוגה"
 
-#: pdfsettingswidget.cpp:163
+#: pdfsettingswidget.cpp:152
+#, kde-format
+msgctxt "@button"
+msgid "List certificates"
+msgstr "הצגת אישורים"
+
+#: pdfsettingswidget.cpp:174
 #, kde-format
 msgid ""
 "You are using a Poppler library built without NSS support.\n"
@@ -358,28 +376,29 @@ msgstr ""
 "נעשה שימוש בספריית Poppler שנבנתה ללא תמיכה ב־NSS.\n"
 "הוספת חתימות דיגיטליות אינה אפשרית בדיוק מהסיבה הזאת"
 
-#: pdfsettingswidget.cpp:187
+#: pdfsettingswidget.cpp:198
 #, kde-format
 msgctxt "certificate end validity"
 msgid "forever"
 msgstr "לעד"
 
-#: pdfsettingswidget.cpp:211
+#: pdfsettingswidget.cpp:222
 #, kde-format
 msgid "Restart needed"
 msgstr "צריך להפעיל מחדש"
 
-#: pdfsettingswidget.cpp:211
+#: pdfsettingswidget.cpp:222
 #, kde-format
 msgid "You need to restart Okular after changing the NSS directory settings"
 msgstr "צריך להפעיל את Okular מחדש לאחר שינוי הגדרות תיקיית ה־NSS"
 
-#: pdfsignatureutils.cpp:234
+#: pdfsignatureutils.cpp:236
 #, kde-format
-msgid "Enter Password"
-msgstr "נא למלא סיסמה"
+msgid "Enter password to open: %1"
+msgstr "נא למלא סיסמה כדי לפתוח את: %1"
 
-#: pdfsignatureutils.cpp:234
-#, kde-format
-msgid "Enter password to open %1:"
-msgstr "נא למלא סיסמה כדי לפתוח את %1:"
+#~ msgid "Enter Password"
+#~ msgstr "נא למלא סיסמה"
+
+#~ msgid "Failed renaming temporary file %1:"
+#~ msgstr "שינוי שם הקובץ הזמני %1 נכשל:"

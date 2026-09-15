@@ -4,17 +4,17 @@
 # Thomas Boeglin <thomas.boeglin@gmail.com>, 2007, 2008.
 # Guillaume Pujol <guill.p@gmail.com>, 2008.
 # Florian Guillochon <florian.guillochon@gmail.com>, 2009.
-# SPDX-FileCopyrightText: 2012, 2013, 2020, 2021, 2023, 2025, 2026 Xavier Besnard <xavier.besnard@kde.org>
+# SPDX-FileCopyrightText: 2012-2013, 2020-2021, 2023, 2025-2026 Xavier Besnard <xavier.besnard@kde.org>
 # Peter Potrowl <peter.potrowl@gmail.com>, 2018, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: okular_poppler\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2026-07-02 00:42+0000\n"
-"PO-Revision-Date: 2026-01-03 18:02+0100\n"
+"POT-Creation-Date: 2026-09-03 00:41+0000\n"
+"PO-Revision-Date: 2026-08-29 20:31+0200\n"
 "Last-Translator: Xavier Besnard <xavier.besnard@kde.org>\n"
-"Language-Team: \n"
+"Language-Team: fr\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Accelerator-Marker: &\n"
 "X-Environment: kde\n"
-"X-Generator: Lokalize 25.12.0\n"
+"X-Generator: Lokalize 26.08.0\n"
 "X-Text-Markup: kde4\n"
 
 #, kde-format
@@ -36,6 +36,22 @@ msgid "Your emails"
 msgstr ""
 "xavier.besnard@kde.org, thomas.boeglin@gmail.com, florian.guillochon@gmail."
 "com, peter.potrowl@gmail.com"
+
+#: annots.cpp:587 formfields.cpp:535 generator_pdf.cpp:2183
+#: generator_pdf.cpp:2211
+#, kde-format
+msgid "Failed writing temporary file"
+msgstr "Échec de l'écriture du fichier temporaire"
+
+#: annots.cpp:603 formfields.cpp:557 generator_pdf.cpp:2234
+#, kde-format
+msgid "Failed removing file"
+msgstr "Échec de la suppression du fichier"
+
+#: annots.cpp:607
+#, kde-format
+msgid "Failed renaming temporary file"
+msgstr "Échec du renommage du fichier temporaire"
 
 #. i18n: ectx: property (text), widget (QLabel, label_3)
 #: conf/pdfsettingswidget.ui:19
@@ -184,6 +200,12 @@ msgstr "Certificats disponibles"
 msgid "&Load Signatures"
 msgstr "Charger &les signatures"
 
+#: formfields.cpp:561 generator_pdf.cpp:2238
+#, kde-format
+msgctxt "%1 is an error message"
+msgid "Failed renaming temporary file: %1"
+msgstr "Échec du renommage du fichier temporaire : %1"
+
 #: generator_pdf.cpp:85
 #, kde-format
 msgid "PDF Options"
@@ -216,7 +238,7 @@ msgstr "Forcer la rastérisation (conversion en image)"
 #: generator_pdf.cpp:92
 #, kde-format
 msgid "Rasterize into an image before printing"
-msgstr "Rastériser (convertir en image) avant l'impression"
+msgstr "Rastériser (Convertir en image) avant l'impression"
 
 #: generator_pdf.cpp:93
 #, kde-format
@@ -313,17 +335,7 @@ msgstr "PDF"
 msgid "PDF Backend Configuration"
 msgstr "Configuration du moteur PDF"
 
-#: generator_pdf.cpp:2183 generator_pdf.cpp:2211
-#, kde-format
-msgid "Failed writing temporary file"
-msgstr "Échec de l'écriture du fichier temporaire"
-
-#: generator_pdf.cpp:2233
-#, kde-format
-msgid "Failed renaming temporary file"
-msgstr "Échec du renommage du fichier temporaire"
-
-#: generator_pdf.cpp:2253
+#: generator_pdf.cpp:2258
 #, kde-format
 msgid ""
 "Some errors were found in the document, Okular might not be able to show the "
@@ -332,7 +344,7 @@ msgstr ""
 "Des erreurs ont été trouvées dans le document. Okular pourrait ne pas être "
 "en mesure d'afficher le contenu correctement."
 
-#: pdfsettingswidget.cpp:115
+#: pdfsettingswidget.cpp:116
 #, kde-format
 msgctxt "@info Kind of a notice/warning"
 msgid ""
@@ -340,32 +352,38 @@ msgid ""
 "based backend activated"
 msgstr ""
 "Ces signatures ne fonctionnent qu'entre les versions récentes de Okular "
-"ayant  le moteur reposant sur GnuPG activé"
+"ayant le moteur reposant sur GnuPG activé"
 
-#: pdfsettingswidget.cpp:116
+#: pdfsettingswidget.cpp:117
 #, kde-format
 msgctxt "@title:dialog"
 msgid "Enable PGP Signatures"
 msgstr "Activer les signatures « PGP »"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgctxt "Name of the person to whom the cerficate was issued"
 msgid "Issued to"
 msgstr "Émis pour"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgid "E-mail"
 msgstr "Courriel"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgctxt "Certificate expiration date"
 msgid "Expiration date"
 msgstr "Date d'expiration"
 
-#: pdfsettingswidget.cpp:163
+#: pdfsettingswidget.cpp:152
+#, kde-format
+msgctxt "@button"
+msgid "List certificates"
+msgstr "Établir la liste des certificats"
+
+#: pdfsettingswidget.cpp:174
 #, kde-format
 msgid ""
 "You are using a Poppler library built without NSS support.\n"
@@ -375,39 +393,37 @@ msgstr ""
 "prise en charge de « NSS ».\n"
 "L'ajout de signatures numériques est indisponible pour cette raison."
 
-#: pdfsettingswidget.cpp:187
+#: pdfsettingswidget.cpp:198
 #, kde-format
 msgctxt "certificate end validity"
 msgid "forever"
 msgstr "pour toujours"
 
-#: pdfsettingswidget.cpp:211
+#: pdfsettingswidget.cpp:222
 #, kde-format
 msgid "Restart needed"
 msgstr "Redémarrage nécessaire"
 
-#: pdfsettingswidget.cpp:211
+#: pdfsettingswidget.cpp:222
 #, kde-format
 msgid "You need to restart Okular after changing the NSS directory settings"
 msgstr ""
 "Vous devez redémarrer Okular après modification des paramètres de dossier "
 "« NSS »."
 
-#: pdfsignatureutils.cpp:234
+#: pdfsignatureutils.cpp:236
 #, kde-format
-msgid "Enter Password"
-msgstr "Veuillez saisir le mot de passe"
+msgid "Enter password to open: %1"
+msgstr "Veuillez saisir le mot de passe pour ouverture de : %1"
 
-#: pdfsignatureutils.cpp:234
-#, kde-format
-msgid "Enter password to open %1:"
-msgstr "Veuillez saisir le mot de passe pour ouvrir %1 :"
+#~ msgid "Enter Password"
+#~ msgstr "Veuillez saisir le mot de passe"
+
+#~ msgid "Failed renaming temporary file %1:"
+#~ msgstr "Échec du renommage du fichier temporaire %1 :"
 
 #~ msgid "Not Available"
 #~ msgstr "Non disponible"
-
-#~ msgid "PDF Certificates"
-#~ msgstr "Certificats « PDF »"
 
 #~ msgid "PDF Digital Signature Certificates"
 #~ msgstr "Certificats de signature numérique « PDF »"

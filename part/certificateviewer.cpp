@@ -73,7 +73,8 @@ CertificateViewer::CertificateViewer(const Okular::CertificateInfo &certInfo, QW
     auto subjectBox = new QGroupBox(i18n("Issued To"), generalPage);
     auto subjectFormLayout = new QFormLayout(subjectBox);
     subjectFormLayout->setLabelAlignment(Qt::AlignLeft);
-    subjectFormLayout->addRow(i18n("Common Name(CN)"), new QLabel(m_certificateInfo.subjectInfo(Okular::CertificateInfo::CommonName, Okular::CertificateInfo::EmptyString::TranslatedNotAvailable)));
+    subjectFormLayout->addRow(m_certificateInfo.certificateType() == Okular::CertificateInfo::X509 ? i18n("Common Name(CN)") : i18n("Name"),
+                              new QLabel(m_certificateInfo.subjectInfo(Okular::CertificateInfo::CommonName, Okular::CertificateInfo::EmptyString::TranslatedNotAvailable)));
     subjectFormLayout->addRow(i18n("EMail"), new QLabel(m_certificateInfo.subjectInfo(Okular::CertificateInfo::EmailAddress, Okular::CertificateInfo::EmptyString::TranslatedNotAvailable)));
 
     if (m_certificateInfo.certificateType() == Okular::CertificateInfo::X509) {
@@ -117,6 +118,7 @@ CertificateViewer::CertificateViewer(const Okular::CertificateInfo &certInfo, QW
     auto certTree = new QTreeView(this);
     certTree->setIndentation(0);
     m_certificateModel = new CertificateModel(m_certificateInfo, this);
+    certTree->setSizePolicy(certTree->sizePolicy().horizontalPolicy(), QSizePolicy::Expanding);
     certTree->setModel(m_certificateModel);
     connect(certTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &CertificateViewer::updateText);
     m_propertyText = new QTextEdit(this);
@@ -141,7 +143,10 @@ void CertificateViewer::updateText(const QModelIndex &index)
         break;
     case CertificateModel::Issuer:
     case CertificateModel::Subject:
-        text = splitDNAttributes(m_certificateModel->data(index, CertificateModel::PropertyVisibleValueRole).toString());
+        text = m_certificateModel->data(index, CertificateModel::PropertyVisibleValueRole).toString();
+        if (m_certificateInfo.certificateType() == Okular::CertificateInfo::X509) {
+            text = splitDNAttributes(text);
+        }
         break;
     case CertificateModel::PublicKey:
         text = QString::fromLatin1(m_certificateInfo.publicKey().toHex(' '));
@@ -163,6 +168,11 @@ void CertificateViewer::updateText(const QModelIndex &index)
     m_propertyText->setText(text);
 }
 
+static QString sanitizedFileName(QString &&fileName)
+{
+    return std::move(fileName.replace(u' ', u'_').replace(u'/', u'_').replace(u'\\', u'_').replace(u':', u'_'));
+}
+
 void CertificateViewer::exportCertificate()
 {
     const QString caption = i18n("Where do you want to save this certificate?");
@@ -170,7 +180,7 @@ void CertificateViewer::exportCertificate()
     QString fileName;
     if (m_certificateInfo.certificateType() == Okular::CertificateInfo::PGP) {
         fileTypes = i18n("Certificate File (*.asc)");
-        fileName = QStringLiteral("%1_public.asc").arg(m_certificateInfo.nickName());
+        fileName = sanitizedFileName(QStringLiteral("%1_%2_public.asc").arg(m_certificateInfo.subjectInfo(Okular::CertificateInfo::CommonName, Okular::CertificateInfo::EmptyString::Empty), m_certificateInfo.nickName()));
     } else {
         fileTypes = i18n("Certificate File (*.cer)");
         fileName = QStringLiteral("Certificate.cer");

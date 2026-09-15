@@ -1,13 +1,13 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# SPDX-FileCopyrightText: 2013, 2020, 2021, 2023, 2025 Giovanni Sora <g.sora@tiscali.it>
+# SPDX-FileCopyrightText: 2013, 2020, 2021, 2023, 2025, 2026 Giovanni Sora <g.sora@tiscali.it>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2026-07-02 00:42+0000\n"
-"PO-Revision-Date: 2025-09-02 17:18+0200\n"
+"POT-Creation-Date: 2026-09-03 00:41+0000\n"
+"PO-Revision-Date: 2026-09-02 16:02+0200\n"
 "Last-Translator: giovanni <g.sora@tiscali.it>\n"
 "Language-Team: Interlingua <kde-i18n-doc@kde.org>\n"
 "Language: ia\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 23.08.5\n"
+"X-Generator: Lokalize 25.04.0\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -26,6 +26,22 @@ msgstr "Giovanni Sora"
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
 msgstr "g.sora@tiscali.it"
+
+#: annots.cpp:587 formfields.cpp:535 generator_pdf.cpp:2183
+#: generator_pdf.cpp:2211
+#, kde-format
+msgid "Failed writing temporary file"
+msgstr "Ilfalleva a scriber file temporanee"
+
+#: annots.cpp:603 formfields.cpp:557 generator_pdf.cpp:2234
+#, kde-format
+msgid "Failed removing file"
+msgstr "Il falleva a remover file"
+
+#: annots.cpp:607
+#, kde-format
+msgid "Failed renaming temporary file"
+msgstr "Il falleva a renominar file temporanee"
 
 #. i18n: ectx: property (text), widget (QLabel, label_3)
 #: conf/pdfsettingswidget.ui:19
@@ -174,6 +190,12 @@ msgstr "Certificatos disponibile"
 msgid "&Load Signatures"
 msgstr "Car&ga Signaturas"
 
+#: formfields.cpp:561 generator_pdf.cpp:2238
+#, kde-format
+msgctxt "%1 is an error message"
+msgid "Failed renaming temporary file: %1"
+msgstr "Il falleva a renominar file temporanee: %1"
+
 #: generator_pdf.cpp:85
 #, kde-format
 msgid "PDF Options"
@@ -302,17 +324,7 @@ msgstr "PDF"
 msgid "PDF Backend Configuration"
 msgstr "Configuration de Retro-administration de PDF"
 
-#: generator_pdf.cpp:2183 generator_pdf.cpp:2211
-#, kde-format
-msgid "Failed writing temporary file"
-msgstr "Ilfalleva a scriber file temporanee"
-
-#: generator_pdf.cpp:2233
-#, kde-format
-msgid "Failed renaming temporary file"
-msgstr "Il falleva a renominar file temporanee"
-
-#: generator_pdf.cpp:2253
+#: generator_pdf.cpp:2258
 #, kde-format
 msgid ""
 "Some errors were found in the document, Okular might not be able to show the "
@@ -321,7 +333,7 @@ msgstr ""
 "Alcun errores esseva trovate in le documento, Okular poterea non esser "
 "capace de monstrar le contento correctemente"
 
-#: pdfsettingswidget.cpp:115
+#: pdfsettingswidget.cpp:116
 #, kde-format
 msgctxt "@info Kind of a notice/warning"
 msgid ""
@@ -331,30 +343,36 @@ msgstr ""
 "Iste signaturas pote solmente functionar inter moderne versiones de Okular "
 "con le retro administration de GnuPG activate"
 
-#: pdfsettingswidget.cpp:116
+#: pdfsettingswidget.cpp:117
 #, kde-format
 msgctxt "@title:dialog"
 msgid "Enable PGP Signatures"
 msgstr "Habilita Signaturas de PGP"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgctxt "Name of the person to whom the cerficate was issued"
 msgid "Issued to"
 msgstr "Emittite a"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgid "E-mail"
 msgstr "E-Posta"
 
-#: pdfsettingswidget.cpp:146
+#: pdfsettingswidget.cpp:147
 #, kde-format
 msgctxt "Certificate expiration date"
 msgid "Expiration date"
 msgstr "Data de expiration"
 
-#: pdfsettingswidget.cpp:163
+#: pdfsettingswidget.cpp:152
+#, kde-format
+msgctxt "@button"
+msgid "List certificates"
+msgstr "Lista certificatos"
+
+#: pdfsettingswidget.cpp:174
 #, kde-format
 msgid ""
 "You are using a Poppler library built without NSS support.\n"
@@ -363,33 +381,34 @@ msgstr ""
 "Tu es usante bibliotheca de Poppler construite sin supporto de NSS.\n"
 "Addes signaturas digital non es possibile per ille  ration"
 
-#: pdfsettingswidget.cpp:187
+#: pdfsettingswidget.cpp:198
 #, kde-format
 msgctxt "certificate end validity"
 msgid "forever"
 msgstr "pro sempre"
 
-#: pdfsettingswidget.cpp:211
+#: pdfsettingswidget.cpp:222
 #, kde-format
 msgid "Restart needed"
 msgstr "Necessita re-initiar"
 
-#: pdfsettingswidget.cpp:211
+#: pdfsettingswidget.cpp:222
 #, kde-format
 msgid "You need to restart Okular after changing the NSS directory settings"
 msgstr ""
 "Tu necessita reinitiar Okular postea modificar le preferentias de directorio "
 "NSS."
 
-#: pdfsignatureutils.cpp:234
+#: pdfsignatureutils.cpp:236
 #, kde-format
-msgid "Enter Password"
-msgstr "Inserta contrasigno"
+msgid "Enter password to open: %1"
+msgstr "Inserta contrasigno per aperir :%1"
 
-#: pdfsignatureutils.cpp:234
-#, kde-format
-msgid "Enter password to open %1:"
-msgstr "Inserta contrasigno per aperir %1:"
+#~ msgid "Enter Password"
+#~ msgstr "Inserta contrasigno"
+
+#~ msgid "Failed renaming temporary file %1:"
+#~ msgstr "Il falleva a renominar file temporanee %1:"
 
 #~ msgid "Not Available"
 #~ msgstr "Non disponibile"

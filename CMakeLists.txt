@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 # KDE Application Version, managed by release script
 set (RELEASE_SERVICE_VERSION_MAJOR "26")
-set (RELEASE_SERVICE_VERSION_MINOR "07")
+set (RELEASE_SERVICE_VERSION_MINOR "11")
 set (RELEASE_SERVICE_VERSION_MICRO "70")
 set (RELEASE_SERVICE_VERSION "${RELEASE_SERVICE_VERSION_MAJOR}.${RELEASE_SERVICE_VERSION_MINOR}.${RELEASE_SERVICE_VERSION_MICRO}")
 
@@ -16,7 +16,7 @@ set(OKULAR_UI "" CACHE STRING "Which Okular user interface to build. Possible va
 set(FORCE_NOT_REQUIRED_DEPENDENCIES "" CACHE STRING "List (semicolon-separated) of dependencies that will be downgraded from REQUIRED to RECOMMENDED")
 
 find_package(ECM ${KF_REQUIRED_VERSION} CONFIG REQUIRED)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 
 include(ECMInstallIcons)
 include(ECMSetupVersion)
@@ -196,7 +196,7 @@ endif()
 
 if(NOT WIN32 AND NOT ANDROID AND NOT APPLE AND NOT HAIKU)
     if (Qt6Gui_VERSION VERSION_GREATER_EQUAL "6.10.0")
-        find_package(Qt6GuiPrivate ${REQUIRED_QT_VERSION} REQUIRED)
+        find_package(Qt6GuiPrivate ${QT_REQUIRED_VERSION} REQUIRED)
     else()
         find_package(Qt6Gui REQUIRED COMPONENTS Private)
     endif()
@@ -467,7 +467,6 @@ if (TARGET Qt6::Qml)
     target_sources(okularcore PRIVATE
             core/script/executor_js.cpp
             core/script/js_app.cpp
-            core/script/js_console.cpp
             core/script/js_data.cpp
             core/script/js_display.cpp
             core/script/js_document.cpp

@@ -842,17 +842,6 @@ Generator *DocumentPrivate::loadGeneratorLibrary(const KPluginMetaData &service)
     return result.plugin;
 }
 
-void DocumentPrivate::loadAllGeneratorLibraries()
-{
-    if (m_generatorsLoaded) {
-        return;
-    }
-
-    loadServiceList(availableGenerators());
-
-    m_generatorsLoaded = true;
-}
-
 void DocumentPrivate::loadServiceList(const QList<KPluginMetaData> &offers)
 {
     int count = offers.count();
@@ -870,12 +859,6 @@ void DocumentPrivate::loadServiceList(const QList<KPluginMetaData> &offers)
         auto *g = loadGeneratorLibrary(offer);
         (void)g;
     }
-}
-
-void DocumentPrivate::unloadGenerator(GeneratorInfo &info)
-{
-    delete info.generator;
-    info.generator = nullptr;
 }
 
 void DocumentPrivate::cacheExportFormats()
@@ -898,24 +881,12 @@ void DocumentPrivate::cacheExportFormats()
 
 ConfigInterface *DocumentPrivate::generatorConfig(GeneratorInfo &info)
 {
-    if (info.configChecked) {
-        return info.config;
-    }
-
-    info.config = qobject_cast<Okular::ConfigInterface *>(info.generator);
-    info.configChecked = true;
-    return info.config;
+    return qobject_cast<Okular::ConfigInterface *>(info.generator);
 }
 
 SaveInterface *DocumentPrivate::generatorSave(GeneratorInfo &info)
 {
-    if (info.saveChecked) {
-        return info.save;
-    }
-
-    info.save = qobject_cast<Okular::SaveInterface *>(info.generator);
-    info.saveChecked = true;
-    return info.save;
+    return qobject_cast<Okular::SaveInterface *>(info.generator);
 }
 
 Document::OpenResult DocumentPrivate::openDocumentInternal(const KPluginMetaData &offer, bool isstdin, const QString &docFile, const QByteArray &filedata, const QString &password)
@@ -1204,7 +1175,7 @@ void DocumentPrivate::recalculateForms()
                                 // Prepare text calculate event
                                 event = Event::createFormCalculateEvent(form, page);
                                 const ScriptAction *linkscript = static_cast<const ScriptAction *>(action);
-                                executeScriptEvent(event, linkscript);
+                                executeScriptEvent(event, *linkscript);
                                 // The value maybe changed in javascript so save it first.
                                 QString oldVal = form->value().toString();
 
@@ -2212,12 +2183,17 @@ int DocumentPrivate::findFieldPageNumber(Okular::FormField *field)
     return foundPage;
 }
 
-void DocumentPrivate::executeScriptEvent(const std::shared_ptr<Event> &event, const Okular::ScriptAction *linkscript)
+void DocumentPrivate::executeScriptEvent(const std::shared_ptr<Event> &event, const Okular::ScriptAction &linkscript)
+{
+    executeScriptEvent(event, linkscript.scriptType(), linkscript.script());
+}
+
+void DocumentPrivate::executeScriptEvent(const std::shared_ptr<Event> &event, ScriptType type, const QString &script)
 {
     if (!m_scripter) {
         m_scripter = new Scripter(this);
     }
-    m_scripter->execute(event.get(), linkscript->scriptType(), linkscript->script());
+    m_scripter->execute(event.get(), type, script);
 }
 
 Document::Document(QWidget *widget)
@@ -2251,7 +2227,7 @@ Document::~Document()
 
     // delete the loaded generators
     for (auto &generator : d->m_loadedGenerators) {
-        d->unloadGenerator(generator);
+        delete generator.generator;
     }
     d->m_loadedGenerators.clear();
 
@@ -2546,9 +2522,8 @@ Document::OpenResult Document::openDocument(const QString &docFile, const QUrl &
     if (!docScripts.isEmpty()) {
         d->m_scripter = new Scripter(d);
         for (const QString &docscript : docScripts) {
-            const Okular::ScriptAction *linkScript = new Okular::ScriptAction(Okular::JavaScript, docscript);
             std::shared_ptr<Event> event = Event::createDocEvent(Event::DocOpen);
-            d->executeScriptEvent(event, linkScript);
+            d->executeScriptEvent(event, Okular::JavaScript, docscript);
         }
     }
 
@@ -4325,7 +4300,7 @@ void Document::processFormatAction(const Action *action, Okular::FormField *ff)
 
     const ScriptAction *linkscript = static_cast<const ScriptAction *>(action);
 
-    d->executeScriptEvent(event, linkscript);
+    d->executeScriptEvent(event, *linkscript);
 
     const QString formattedText = event->value().toString();
     ff->commitFormattedValue(formattedText);
@@ -4440,7 +4415,7 @@ void Document::processKeystrokeAction(const Action *action, Okular::FormField *f
     event->setChange(DocumentPrivate::evaluateKeystrokeEventChange(inputString, newValue.toString(), selStart, selEnd));
     const ScriptAction *linkscript = static_cast<const ScriptAction *>(action);
 
-    d->executeScriptEvent(event, linkscript);
+    d->executeScriptEvent(event, *linkscript);
 
     if (event->returnCode()) {
         ff->setValue(newValue);
@@ -4480,7 +4455,7 @@ void Document::processKeystrokeCommitAction(const Action *action, Okular::FormFi
 
     const ScriptAction *linkscript = static_cast<const ScriptAction *>(action);
 
-    d->executeScriptEvent(event, linkscript);
+    d->executeScriptEvent(event, *linkscript);
 
     if (!event->returnCode()) {
         ff->setValue(QVariant(ff->committedFormattedValue()));
@@ -4511,7 +4486,7 @@ void Document::processFocusAction(const Action *action, Okular::FormField *field
 
     const ScriptAction *linkscript = static_cast<const ScriptAction *>(action);
 
-    d->executeScriptEvent(event, linkscript);
+    d->executeScriptEvent(event, *linkscript);
 }
 
 void Document::processValidateAction(const Action *action, Okular::FormFieldText *fft, bool &returnCode)
@@ -4537,7 +4512,7 @@ void Document::processValidateAction(const Action *action, Okular::FormField *ff
 
     const ScriptAction *linkscript = static_cast<const ScriptAction *>(action);
 
-    d->executeScriptEvent(event, linkscript);
+    d->executeScriptEvent(event, *linkscript);
     if (!event->returnCode()) {
         ff->setValue(QVariant(ff->committedFormattedValue()));
         Q_EMIT refreshFormWidget(ff);
@@ -4584,6 +4559,30 @@ void Document::processKVCFActions(Okular::FormField *ff)
     }
 }
 
+QList<Document::DocumentAdditionalActionType> Document::documentAdditionalActionTypes() const
+{
+    QList<DocumentAdditionalActionType> types;
+    if (!Scripter::canExecuteScripts()) {
+        return types;
+    }
+    if (d->m_generator->additionalDocumentAction(Document::CloseDocument)) {
+        types << Document::CloseDocument;
+    }
+    if (d->m_generator->additionalDocumentAction(Document::PrintDocumentStart)) {
+        types << Document::PrintDocumentStart;
+    }
+    if (d->m_generator->additionalDocumentAction(Document::PrintDocumentFinish)) {
+        types << Document::PrintDocumentFinish;
+    }
+    if (d->m_generator->additionalDocumentAction(Document::SaveDocumentStart)) {
+        types << Document::SaveDocumentFinish;
+    }
+    if (d->m_generator->additionalDocumentAction(Document::SaveDocumentFinish)) {
+        types << Document::SaveDocumentFinish;
+    }
+    return types;
+}
+
 void Document::processDocumentAction(const Action *action, DocumentAdditionalActionType type)
 {
     if (!action || action->actionType() != Action::Script) {
@@ -4614,7 +4613,7 @@ void Document::processDocumentAction(const Action *action, DocumentAdditionalAct
 
     const ScriptAction *linkScript = static_cast<const ScriptAction *>(action);
 
-    d->executeScriptEvent(event, linkScript);
+    d->executeScriptEvent(event, *linkScript);
 }
 
 void Document::processFormMouseScriptAction(const Action *action, Okular::FormField *ff, MouseEventType fieldMouseEventType)
@@ -4652,7 +4651,7 @@ void Document::processFormMouseScriptAction(const Action *action, Okular::FormFi
 
     const ScriptAction *linkscript = static_cast<const ScriptAction *>(action);
 
-    d->executeScriptEvent(event, linkscript);
+    d->executeScriptEvent(event, *linkscript);
 }
 
 void Document::processFormMouseUpScripAction(const Action *action, Okular::FormField *ff)
@@ -4841,14 +4840,8 @@ void Document::fillConfigDialog(KConfigDialog *dialog)
         return;
     }
 
-    // We know it's a BackendConfigDialog, but check anyway
-    BackendConfigDialog *bcd = dynamic_cast<BackendConfigDialog *>(dialog);
-    if (!bcd) {
-        return;
-    }
-
     // ensure that we have all the generators with settings loaded
-    QList<KPluginMetaData> offers = DocumentPrivate::configurableGenerators();
+    QList<KPluginMetaData> offers = DocumentPrivate::availableGenerators();
     d->loadServiceList(offers);
 
     // We want the generators to be sorted by name so let's fill in a QMap
@@ -4865,29 +4858,11 @@ void Document::fillConfigDialog(KConfigDialog *dialog)
         if (iface) {
             iface->addPages(dialog);
             pagesAdded = true;
-
-            if (value.generator == d->m_generator) {
-                const int rowCount = bcd->thePageWidget()->model()->rowCount();
-                KPageView *view = bcd->thePageWidget();
-                view->setCurrentPage(view->model()->index(rowCount - 1, 0));
-            }
         }
     }
     if (pagesAdded) {
         connect(dialog, &KConfigDialog::settingsChanged, this, [this] { d->slotGeneratorConfigChanged(); });
     }
-}
-
-QList<KPluginMetaData> DocumentPrivate::configurableGenerators()
-{
-    const QList<KPluginMetaData> available = availableGenerators();
-    QList<KPluginMetaData> result;
-    for (const KPluginMetaData &md : available) {
-        if (md.rawData().value(QStringLiteral("X-KDE-okularHasInternalSettings")).toBool()) {
-            result << md;
-        }
-    }
-    return result;
 }
 
 KPluginMetaData Document::generatorInfo() const
@@ -4903,7 +4878,13 @@ KPluginMetaData Document::generatorInfo() const
 
 int Document::configurableGenerators() const
 {
-    return DocumentPrivate::configurableGenerators().size();
+    int configurableGenerators = 0;
+    for (auto generator : std::as_const(d->m_loadedGenerators)) {
+        if (d->generatorConfig(generator)) {
+            configurableGenerators++;
+        }
+    }
+    return configurableGenerators;
 }
 
 QStringList Document::supportedMimeTypes() const

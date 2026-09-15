@@ -278,7 +278,6 @@ public Q_SLOTS:
     void slotFileDirty(const QString &);
     bool slotAttemptReload(bool oneShot = false, const QUrl &newUrl = QUrl());
     void psTransformEnded(int, QProcess::ExitStatus);
-    KConfigDialog *slotGeneratorPreferences();
 
     void errorMessage(const QString &message, int duration = 0);
     void warningMessage(const QString &message, int duration = -1);
@@ -290,8 +289,10 @@ public Q_SLOTS:
 #endif
 
 private:
+    friend class PartTest;
     bool aboutToShowContextMenu(QMenu *menu, QAction *action, QMenu *contextMenu);
     void showMenu(const Okular::Page *page, const QPoint point, const QString &bookmarkTitle = QString(), const Okular::DocumentViewport &vp = DocumentViewport(), bool showTOCActions = false);
+    KConfigDialog *realSlotPreferences();
     /**
      * Searches the actionCollections of all KXMLGUIClients that were created by the same factory()
      * as this Part for a QAction that has both the specified name and the specified class.
@@ -364,6 +365,7 @@ private:
     KMessageWidget *m_migrationMessage;
     KMessageWidget *m_topMessage;
     KMessageWidget *m_formsMessage;
+    KMessageWidget *m_printMightDifferMessage;
     KMessageWidget *m_infoMessage;
     KMessageWidget *m_signatureMessage;
 #if HAVE_NEW_SIGNATURE_API

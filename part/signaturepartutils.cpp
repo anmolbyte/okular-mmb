@@ -39,6 +39,7 @@
 #include <KConfigGroup>
 #include <KLocalizedString>
 #include <KMessageBox>
+#include <KPasswordDialog>
 #include <KSharedConfig>
 namespace
 {
@@ -221,14 +222,25 @@ std::optional<SigningInformation> getCertificateAndPasswordForSigning(PageView *
         }
     }
 
-    // I could not find any case in which i need to enter a password to use the certificate, seems that once you unlcok the firefox/NSS database
-    // you don't need a password anymore, but still there's code to do that in NSS so we have code to ask for it if needed. What we do is
-    // ask if the empty password is fine, if it is we don't ask the user anything, if it's not, we ask for a password
+    // In the case of a certificate on a token, you need one password to list the certificates on the token(s).
+    // but you might need a different password to access the certificate on the token.
+    // It is at least in some tokens called 'token password' for listing the certificate and certificate pin
+    // for the actual signind
     bool passok = cert.checkPassword(password);
     while (!passok) {
-        const QString title = i18n("Enter password (if any) to unlock certificate: %1", cert.nickName());
-        bool ok;
-        password = QInputDialog::getText(pageView, i18n("Enter certificate password"), title, QLineEdit::Password, QString(), &ok);
+        const QString title = i18n("Enter password/pin (if any) to unlock certificate: %1", cert.nickName());
+        bool ok = false;
+        QPointer<KPasswordDialog> passwordDialog = new KPasswordDialog(nullptr);
+        passwordDialog->setRevealPasswordMode(KPassword::RevealMode::OnlyNew);
+        passwordDialog->setPrompt(title);
+        if (!passwordDialog->exec()) {
+            delete passwordDialog;
+        }
+        if (passwordDialog) {
+            password = passwordDialog->password();
+            ok = true;
+            delete passwordDialog;
+        }
         if (ok) {
             passok = cert.checkPassword(password);
         } else {
@@ -264,7 +276,21 @@ QString getFileNameForNewSignedFile(PageView *pageView, Okular::Document *doc)
     const QString localFilePathIfAny = currentFileUrl.isLocalFile() ? QFileInfo(currentFileUrl.toLocalFile()).canonicalPath() + QLatin1Char('/') : QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     const QString newFileName = localFilePathIfAny + getSuggestedFileNameForSignedFile(currentFileUrl.fileName(), mimeType.preferredSuffix());
 
-    return QFileDialog::getSaveFileName(pageView, i18n("Save Signed File As"), newFileName, mimeTypeFilter);
+    for (int retries = 0; retries < 3; retries++) {
+        // On windows, saving to the current open document does not work because
+        // poppler keeps the file open and replacing open files on windows
+        // is not possible
+        auto fileName = QFileDialog::getSaveFileName(pageView, i18n("Save Signed File As"), newFileName, mimeTypeFilter);
+        if (QUrl::fromLocalFile(fileName) == doc->currentDocument()) {
+            KMessageBox::error(pageView, i18nc("Error message", "The original file cannot be overwritten. Please choose a different filename."));
+            if (retries == 2) {
+                return QString {};
+            }
+            continue;
+        }
+        return fileName;
+    }
+    return QString {};
 }
 
 void signUnsignedSignature(const Okular::FormFieldSignature *form, PageView *pageView, Okular::Document *doc)
@@ -303,7 +329,7 @@ void signUnsignedSignature(const Okular::FormFieldSignature *form, PageView *pag
         case Okular::UserCancelled:
             break;
         case Okular::BadPassphrase:
-            KMessageBox::detailedError(pageView, errorString(success.first, {}), success.second);
+            KMessageBox::error(pageView, errorString(success.first, {}));
             break;
         case Okular::SignatureWriteFailed:
             KMessageBox::detailedError(pageView, errorString(success.first, newFilePath), success.second);

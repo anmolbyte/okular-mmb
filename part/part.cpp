@@ -460,6 +460,13 @@ Part::Part(QObject *parent, const QVariantList &args)
     m_infoTimer = new QTimer();
     m_infoTimer->setSingleShot(true);
     connect(m_infoTimer, &QTimer::timeout, m_infoMessage, &KMessageWidget::animatedHide);
+    m_printMightDifferMessage = new KMessageWidget(rightContainer);
+    m_printMightDifferMessage->setVisible(false);
+    m_printMightDifferMessage->setWordWrap(true);
+    m_printMightDifferMessage->setPosition(KMessageWidget::Position::Header);
+    m_printMightDifferMessage->setText(
+        i18nc("This is a normal pdf feature, but can be abused by hostile parties", "This document has elements that might be hidden or shown differently when printed. For important documents, please verify both."));
+    rightLayout->addWidget(m_printMightDifferMessage);
     m_signatureMessage = new KMessageWidget(rightContainer);
     m_signatureMessage->setVisible(false);
     m_signatureMessage->setWordWrap(true);
@@ -516,9 +523,6 @@ Part::Part(QObject *parent, const QVariantList &args)
     connect(m_pageView.data(), &PageView::escPressed, m_findBar, &FindBar::resetSearch);
     connect(m_pageNumberTool, &MiniBar::forwardKeyPressEvent, m_pageView, &PageView::externalKeyPressEvent);
     connect(m_pageView.data(), &PageView::requestOpenNewlySignedFile, this, &Part::requestOpenNewlySignedFile);
-#if HAVE_NEW_SIGNATURE_API
-    connect(m_pageView.data(), &PageView::signingStarted, this, [this] { m_signatureInProgressMessage->setVisible(true); });
-#endif
 
     connect(m_reviewsWidget.data(), &Reviews::openAnnotationWindow, m_pageView.data(), &PageView::openAnnotationWindow);
 
@@ -537,6 +541,13 @@ Part::Part(QObject *parent, const QVariantList &args)
     connect(m_document->bookmarkManager(), &BookmarkManager::saved, this, &Part::slotRebuildBookmarkMenu);
 
     setupViewerActions();
+#if HAVE_NEW_SIGNATURE_API
+    connect(m_pageView.data(), &PageView::signingStarted, this, [this] {
+        m_signatureInProgressMessage->setVisible(true);
+        m_saveAs->setEnabled(false);
+        m_save->setEnabled(false);
+    });
+#endif
 
     if (m_embedMode != ViewerWidgetMode) {
         setupActions();
@@ -728,17 +739,6 @@ void Part::setupViewerActions()
         prefs->setText(i18n("Configure Viewer…"));
     }
 
-    QAction *genPrefs = new QAction(ac);
-    ac->addAction(QStringLiteral("options_configure_generators"), genPrefs);
-    if (m_embedMode == ViewerWidgetMode) {
-        genPrefs->setText(i18n("Configure Viewer Backends…"));
-    } else {
-        genPrefs->setText(i18n("Configure Backends…"));
-    }
-    genPrefs->setIcon(QIcon::fromTheme(QStringLiteral("configure")));
-    genPrefs->setEnabled(m_document->configurableGenerators() > 0);
-    connect(genPrefs, &QAction::triggered, this, &Part::slotGeneratorPreferences);
-
     m_printPreview = KStandardAction::printPreview(this, SLOT(slotPrintPreview()), ac);
     m_printPreview->setEnabled(false);
 
@@ -760,6 +760,8 @@ void Part::setupViewerActions()
     m_exportAsMenu = nullptr;
     m_exportAsText = nullptr;
     m_exportAsDocArchive = nullptr;
+
+    m_pasteAnnotation = nullptr;
 
 #if HAVE_PURPOSE
     m_share = nullptr;
@@ -1105,7 +1107,11 @@ void Part::setModified(bool modified)
 {
     KParts::ReadWritePart::setModified(modified);
 
-    if (modified && !m_save->isEnabled()) {
+    if (modified && !m_save->isEnabled()
+#if HAVE_NEW_SIGNATURE_API
+        && !m_signatureInProgressMessage->isVisible()
+#endif
+    ) {
         if (!m_warnedAboutModifyingUnsaveableDocument) {
             m_warnedAboutModifyingUnsaveableDocument = true;
             KMessageBox::information(widget(),
@@ -1227,27 +1233,6 @@ void Part::setWindowTitleFromDocument()
     }
 
     Q_EMIT setWindowCaption(title);
-}
-
-KConfigDialog *Part::slotGeneratorPreferences()
-{
-    // Create dialog
-    KConfigDialog *dialog = new Okular::BackendConfigDialog(m_pageView, QStringLiteral("generator_prefs"), Okular::Settings::self());
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-
-    if (m_embedMode == ViewerWidgetMode) {
-        dialog->setWindowTitle(i18n("Configure Viewer Backends"));
-    } else {
-        dialog->setWindowTitle(i18n("Configure Backends"));
-    }
-
-    m_document->fillConfigDialog(dialog);
-
-    // Show it
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->show();
-
-    return dialog;
 }
 
 void Part::notifySetup(const QList<Okular::Page *> & /*pages*/, int setupFlags)
@@ -1476,9 +1461,9 @@ Document::OpenResult Part::doOpenFile(const QMimeType &mimeA, const QString &fil
             if (password.isNull()) {
                 QString prompt;
                 if (firstInput) {
-                    prompt = i18n("Please enter the password to read the document:");
+                    prompt = i18nc("%1 is filename of the file to open", "Please enter the password to read the document: %1", url().fileName());
                 } else {
-                    prompt = i18n("Incorrect password. Try again:");
+                    prompt = i18nc("%1 is filename of the file to open", "Incorrect password. Try again: %1", url().fileName());
                 }
                 firstInput = false;
 
@@ -1627,22 +1612,54 @@ bool Part::openFile()
     }
 
     if (ok) {
-        KMessageWidget::MessageType messageType;
-        QString message;
+        auto refreshMessage = [this]() {
+            KMessageWidget::MessageType messageType;
+            QString message;
 
-        std::tie(messageType, message) = SignatureGuiUtils::documentSignatureMessageWidgetText(m_document);
+            std::tie(messageType, message) = SignatureGuiUtils::documentSignatureMessageWidgetText(m_document);
 
-        if (!message.isEmpty()) {
-            if (m_embedMode == PrintPreviewMode) {
-                if (Okular::Settings::showEmbeddedContentMessages()) {
-                    m_signatureMessage->setText(i18n("All editing and interactive features for this document are disabled. Please save a copy and reopen to edit this document."));
-                    m_signatureMessage->setVisible(true);
+            if (!message.isEmpty()) {
+                if (m_embedMode == PrintPreviewMode) {
+                    if (Okular::Settings::showEmbeddedContentMessages()) {
+                        m_signatureMessage->setText(i18n("All editing and interactive features for this document are disabled. Please save a copy and reopen to edit this document."));
+                        m_signatureMessage->setVisible(true);
+                    }
+                } else {
+                    if (Okular::Settings::showEmbeddedContentMessages() || messageType > KMessageWidget::Information) {
+                        m_signatureMessage->setMessageType(messageType);
+                        m_signatureMessage->setText(message);
+                        m_signatureMessage->setVisible(true);
+                    }
                 }
-            } else {
-                if (Okular::Settings::showEmbeddedContentMessages() || messageType > KMessageWidget::Information) {
-                    m_signatureMessage->setMessageType(messageType);
-                    m_signatureMessage->setText(message);
-                    m_signatureMessage->setVisible(true);
+            }
+        };
+        refreshMessage();
+        for (uint i = 0; i < m_document->pages(); i++) {
+            const QList<Okular::FormField *> formFields = m_document->page(i)->formFields();
+            for (Okular::FormField *f : formFields) {
+                if (f->type() == Okular::FormField::FormSignature) {
+                    static_cast<Okular::FormFieldSignature *>(f)->subscribeUpdates(refreshMessage);
+                }
+            }
+        }
+
+        m_printMightDifferMessage->setVisible(false);
+
+        QList<Document::DocumentAdditionalActionType> actionTypes = m_document->documentAdditionalActionTypes();
+        if (actionTypes.contains(Document::PrintDocumentStart) || actionTypes.contains(Document::PrintDocumentFinish)) {
+            m_printMightDifferMessage->setVisible(true);
+        }
+
+        for (uint i = 0; (i < m_document->pages()) && m_printMightDifferMessage->isHidden(); i++) {
+            const auto pageAnnots = m_document->page(i)->annotations();
+            for (auto *annot : pageAnnots) {
+                if (annot->flags() & Okular::Annotation::DenyPrint && !(annot->flags() & Okular::Annotation::Hidden)) {
+                    m_printMightDifferMessage->setVisible(true);
+                    break;
+                }
+                if (!(annot->flags() & Okular::Annotation::DenyPrint) && (annot->flags() & Okular::Annotation::Hidden)) {
+                    m_printMightDifferMessage->setVisible(true);
+                    break;
                 }
             }
         }
@@ -2116,6 +2133,10 @@ bool Part::slotAttemptReload(bool oneShot, const QUrl &newUrl)
     if (tocReloadPrepared) {
         m_toc->finishReload();
     }
+
+#if HAVE_NEW_SIGNATURE_API
+    m_signatureInProgressMessage->setVisible(false);
+#endif
 
     // inform the user about the operation in progress
     m_pageView->displayMessage(i18n("Reloading the document…"));
@@ -3012,12 +3033,20 @@ void Part::checkNativeSaveDataLoss(bool *out_wontSaveForms, bool *out_wontSaveAn
 
 void Part::slotPreferences()
 {
+    (void)realSlotPreferences();
+}
+
+KConfigDialog *Part::realSlotPreferences()
+{
     // Create dialog
     PreferencesDialog *dialog = new PreferencesDialog(m_pageView, Okular::Settings::self(), m_embedMode, m_document->editorCommandOverride());
+    m_document->fillConfigDialog(dialog);
+
     dialog->setAttribute(Qt::WA_DeleteOnClose);
 
     // Show it
     dialog->show();
+    return dialog;
 }
 
 void Part::slotToggleChangeColors()
@@ -3035,6 +3064,8 @@ void Part::slotAccessibilityPreferences()
 {
     // Create dialog
     PreferencesDialog *dialog = new PreferencesDialog(m_pageView, Okular::Settings::self(), m_embedMode, m_document->editorCommandOverride());
+    m_document->fillConfigDialog(dialog);
+
     dialog->setAttribute(Qt::WA_DeleteOnClose);
 
     // Show it
@@ -3046,6 +3077,8 @@ void Part::slotAnnotationPreferences()
 {
     // Create dialog
     PreferencesDialog *dialog = new PreferencesDialog(m_pageView, Okular::Settings::self(), m_embedMode, m_document->editorCommandOverride());
+    m_document->fillConfigDialog(dialog);
+
     dialog->setAttribute(Qt::WA_DeleteOnClose);
 
     // Show it
@@ -3705,6 +3738,9 @@ void Part::finishSigning()
 {
     if (m_pageView->finishSigning() != PageView::FinishSigningResult::Cancelled) {
         m_signatureInProgressMessage->setVisible(false);
+        m_saveAs->setEnabled(true);
+        m_save->setEnabled(true);
+        actionCollection()->action(QStringLiteral("add_digital_signature"))->setEnabled(true);
     }
 }
 #endif
