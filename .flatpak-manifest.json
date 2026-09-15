@@ -480,8 +480,8 @@
                 {
                     "type": "git",
                     "url": "https://invent.kde.org/graphics/okular.git",
-                    "tag": "v24.12.3",
-                    "commit": "470e67842ee497f16b490571f75d0931406d516d",
+                    "tag": "v24.08.3",
+                    "commit": "e94e19beb48d790bc752aa5619a9b6c14fabb8d5",
                     "x-checker-data": {
                         "type": "git",
                         "tag-pattern": "^v[0-9]+\\.[0-9]+\\.[0-5]$"
