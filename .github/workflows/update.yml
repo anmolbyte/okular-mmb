@@ -25,4 +25,4 @@ jobs:
           GIT_COMMITTER_EMAIL: action@github.com
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --update .flatpak-manifest.json
+          args: --update --never-fork .flatpak-manifest.json
