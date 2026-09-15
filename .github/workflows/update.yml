@@ -12,10 +12,17 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+      - name: Configure Git
+        run: |
+          git config --global --add safe.directory /github/workspace
+          git config --global user.name "Flatpak External Data Checker"
+          git config --global user.email "action@github.com"
       - uses: docker://ghcr.io/flathub/flatpak-external-data-checker:latest
         env:
           GIT_AUTHOR_NAME: Flatpak External Data Checker
+          GIT_AUTHOR_EMAIL: action@github.com
           GIT_COMMITTER_NAME: Flatpak External Data Checker
+          GIT_COMMITTER_EMAIL: action@github.com
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: --update .flatpak-manifest.json
