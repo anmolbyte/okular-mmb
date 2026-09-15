@@ -6,8 +6,6 @@ on:
     tags: [ "v*" ]
   pull_request:
     branches: [ "master", "main" ]
-  schedule:
-    - cron: '0 0 * * *'
   workflow_dispatch:
 
 permissions:

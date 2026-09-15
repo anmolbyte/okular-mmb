@@ -1,0 +1,14 @@
+name: Check for updates
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: flathub/flatpak-external-data-checker-action@v1
+        with:
+          manifest-path: .flatpak-manifest.json

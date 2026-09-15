@@ -480,7 +480,12 @@
                 {
                     "type": "git",
                     "url": "https://invent.kde.org/graphics/okular.git",
-                    "branch": "master"
+                    "tag": "v24.12.3",
+                    "commit": "470e67842ee497f16b490571f75d0931406d516d",
+                    "x-checker-data": {
+                        "type": "git",
+                        "tag-pattern": "^v[0-9]+\\.[0-9]+\\.[0-5]$"
+                    }
                 },
                 {
                     "type": "patch",
