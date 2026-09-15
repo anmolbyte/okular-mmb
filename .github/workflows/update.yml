@@ -7,8 +7,15 @@ on:
 jobs:
   check-updates:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
-      - uses: flathub/flatpak-external-data-checker-action@v1
+      - uses: docker://ghcr.io/flathub/flatpak-external-data-checker:latest
+        env:
+          GIT_AUTHOR_NAME: Flatpak External Data Checker
+          GIT_COMMITTER_NAME: Flatpak External Data Checker
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          manifest-path: .flatpak-manifest.json
+          args: --update .flatpak-manifest.json
