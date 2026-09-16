@@ -475,8 +475,8 @@
                 {
                     "type": "git",
                     "url": "https://invent.kde.org/plasma/plasma-activities.git",
-                    "tag": "v6.2.5",
-                    "commit": "a6df40894216c332526e75387bf790e828217fc3"
+                    "tag": "v26.08.1",
+                    "commit": "62c5e9433a4854351ceaf6139b9716304f6b6dc4"
                 }
             ]
         },
