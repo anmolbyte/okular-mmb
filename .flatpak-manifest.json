@@ -466,6 +466,21 @@
             ]
         },
         {
+            "name": "plasma-activities",
+            "buildsystem": "cmake-ninja",
+            "config-opts": [
+                "-DPLASMA_ACTIVITIES_LIBRARY_ONLY=ON"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://invent.kde.org/plasma/plasma-activities.git",
+                    "tag": "v6.2.5",
+                    "commit": "a6df40894216c332526e75387bf790e828217fc3"
+                }
+            ]
+        },
+        {
             "name": "okular",
             "buildsystem": "cmake-ninja",
             "builddir": true,
