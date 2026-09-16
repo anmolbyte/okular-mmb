@@ -1,28 +1,60 @@
-name: Check for updates
+name: Check for Okular updates
+
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 6 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  check-updates:
+  check-update:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
-      - name: Configure Git
+
+      - name: Check for new stable Okular release
+        id: check
         run: |
-          git config --global --add safe.directory /github/workspace
-          git config --global user.name "Flatpak External Data Checker"
-          git config --global user.email "action@github.com"
-      - uses: docker://ghcr.io/flathub/flatpak-external-data-checker:latest
-        env:
-          GIT_AUTHOR_NAME: Flatpak External Data Checker
-          GIT_AUTHOR_EMAIL: action@github.com
-          GIT_COMMITTER_NAME: Flatpak External Data Checker
-          GIT_COMMITTER_EMAIL: action@github.com
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: --update --never-fork .flatpak-manifest.json
+          # Get the current tag from the manifest
+          CURRENT_TAG=$(grep -oP '"tag":\s*"\Kv[^"]+' .flatpak-manifest.json | head -1)
+          echo "Current tag: $CURRENT_TAG"
+
+          # Get the latest stable tag from KDE (filter out betas like .80 .85 .90 .95 .97 .98)
+          LATEST_TAG=$(git ls-remote --tags https://invent.kde.org/graphics/okular.git \
+            | grep -oP 'refs/tags/\Kv[0-9]+\.[0-9]+\.[0-5]$' \
+            | sort -V \
+            | tail -1)
+          echo "Latest stable tag: $LATEST_TAG"
+
+          if [ "$CURRENT_TAG" = "$LATEST_TAG" ]; then
+            echo "Already up to date."
+            echo "updated=false" >> "$GITHUB_OUTPUT"
+          else
+            # Get the commit hash for the new tag
+            LATEST_COMMIT=$(git ls-remote --tags https://invent.kde.org/graphics/okular.git "refs/tags/${LATEST_TAG}^{}" \
+              | awk '{print $1}')
+            # If no peeled tag, use the tag directly
+            if [ -z "$LATEST_COMMIT" ]; then
+              LATEST_COMMIT=$(git ls-remote --tags https://invent.kde.org/graphics/okular.git "refs/tags/${LATEST_TAG}" \
+                | awk '{print $1}')
+            fi
+            echo "New commit: $LATEST_COMMIT"
+
+            # Update the manifest
+            sed -i "s/\"tag\": \"$CURRENT_TAG\"/\"tag\": \"$LATEST_TAG\"/" .flatpak-manifest.json
+            sed -i "s/\"commit\": \"[a-f0-9]*\"/\"commit\": \"$LATEST_COMMIT\"/" .flatpak-manifest.json
+
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+            echo "new_tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push update
+        if: steps.check.outputs.updated == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .flatpak-manifest.json
+          git commit -m "Update Okular to ${{ steps.check.outputs.new_tag }}"
+          git push

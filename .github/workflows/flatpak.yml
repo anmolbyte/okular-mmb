@@ -3,9 +3,6 @@ name: Build Flatpak
 on:
   push:
     branches: [ "master", "main" ]
-    tags: [ "v*" ]
-  pull_request:
-    branches: [ "master", "main" ]
   workflow_dispatch:
 
 permissions:
@@ -20,10 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Get Okular version from manifest
+        id: version
+        run: |
+          TAG=$(grep -oP '"tag":\s*"\Kv[^"]+' .flatpak-manifest.json | head -1)
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
       - name: Build Flatpak
         uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          bundle: okular.flatpak
+          bundle: okular-mmb.flatpak
           manifest-path: .flatpak-manifest.json
           cache-key: flatpak-builder-${{ github.sha }}
           run-tests: false
@@ -31,14 +34,19 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: okular-flatpak
-          path: okular.flatpak
+          name: okular-mmb-flatpak
+          path: okular-mmb.flatpak
 
       - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: okular.flatpak
-          name: Release ${{ github.ref_name }}
+          files: okular-mmb.flatpak
+          tag_name: ${{ steps.version.outputs.tag }}-mmb
+          name: Okular-MMB (${{ steps.version.outputs.tag }})
+          body: |
+            Okular-MMB built from KDE Okular ${{ steps.version.outputs.tag }} with middle-mouse-button autoscroll support.
+
+            Install: `flatpak install okular-mmb.flatpak`
           draft: false
           prerelease: false
+          make_latest: true
