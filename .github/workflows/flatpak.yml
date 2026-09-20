@@ -20,7 +20,7 @@ jobs:
       - name: Get Okular version from manifest
         id: version
         run: |
-          TAG=$(grep -oP '"tag":\s*"\Kv[^"]+' .flatpak-manifest.json | head -1)
+          TAG=$(jq -r '.modules[] | select(.name == "okular") | .sources[] | select(.type == "git" and .url == "https://invent.kde.org/graphics/okular.git") | .tag' .flatpak-manifest.json)
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Build Flatpak

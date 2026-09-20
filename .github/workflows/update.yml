@@ -18,7 +18,7 @@ jobs:
         id: check
         run: |
           # Get the current tag from the manifest
-          CURRENT_TAG=$(grep -oP '"tag":\s*"\Kv[^"]+' .flatpak-manifest.json | head -1)
+          CURRENT_TAG=$(jq -r '.modules[] | select(.name == "okular") | .sources[] | select(.type == "git" and .url == "https://invent.kde.org/graphics/okular.git") | .tag' .flatpak-manifest.json)
           echo "Current tag: $CURRENT_TAG"
 
           # Get the latest stable tag from KDE (filter out betas like .80 .85 .90 .95 .97 .98)
@@ -42,9 +42,10 @@ jobs:
             fi
             echo "New commit: $LATEST_COMMIT"
 
-            # Update the manifest
-            sed -i "s/\"tag\": \"$CURRENT_TAG\"/\"tag\": \"$LATEST_TAG\"/" .flatpak-manifest.json
-            sed -i "s/\"commit\": \"[a-f0-9]*\"/\"commit\": \"$LATEST_COMMIT\"/" .flatpak-manifest.json
+            # Update the manifest using jq to only target okular
+            jq --arg tag "$LATEST_TAG" --arg commit "$LATEST_COMMIT" \
+              '(.modules[] | select(.name == "okular") | .sources[] | select(.type == "git" and .url == "https://invent.kde.org/graphics/okular.git")) |= (.tag = $tag | .commit = $commit)' \
+              .flatpak-manifest.json > temp.json && mv temp.json .flatpak-manifest.json
 
             echo "updated=true" >> "$GITHUB_OUTPUT"
             echo "new_tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
