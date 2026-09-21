@@ -7,9 +7,9 @@
     "command": "okular",
     "rename-icon": "okular",
     "tags": [
-        "nightly"
+        "mmb"
     ],
-    "desktop-file-name-suffix": " (Nightly)",
+    "desktop-file-name-suffix": " MMB",
     "finish-args": [
         "--share=ipc",
         "--share=network",
