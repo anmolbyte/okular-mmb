@@ -1,85 +1,13 @@
-# Okular-MMB – Universal Document Viewer
+# Okular-MMB – Universal Document Viewer, but with Middle Mouse Button scroll support!
+This is a series of automated scripts. I have an automation that will check for releases from okular daily. When A new stable version of Okular is released, it will pull the code and recompile after applying patches that allow middle mouse button to scroll, like autoscrolling on firefox or practically any other middle-mouse-click gesture in any other browser or pdf app in windows (and I think in MacOS as well). 
 
-Okular can view and annotate documents of various formats, including PDF, Postscript, Comic Book, and various image formats.
-It supports native PDF annotations.
+Future improvements include adding a toggle for this to switch between MMB scroll and MMB scroll (the default behavior in Okular). I also plan to make builds for Windows, and perhaps MacOS. 
 
 ### Downloads
+See releases tab on the right. Currently distributed only as Flatpak, I'll try to add it to flathub soooooon
 
-For download and installation instructions, see https://okular.kde.org/download.php
+For download and installation instructions of the original program, see https://okular.kde.org/download.php
 
 ### User manual
 
 https://docs.kde.org/?application=okular&branch=stable5
-
-### Bugs
-
-https://bugs.kde.org/buglist.cgi?product=okular
-
-Please report bugs on Bugzilla (https://bugs.kde.org/enter_bug.cgi?product=okular), and not on our GitLab instance (https://invent.kde.org).
-
-### Mailing list
-
-https://mail.kde.org/mailman/listinfo/okular-devel
-
-### Source code
-
-https://invent.kde.org/graphics/okular.git
-
-The Okular repository contains the source code for:
- * the `okular` desktop application (the “shell”),
- * the `okularpart` KParts plugin,
- * the `okularkirigami` mobile application,
- * several `okularGenerator_xyz` plugins, which provide backends for different document types.
-
-### Apidox
-
-https://api.kde.org/okular/html/index.html
-
-## Contributing
-
-Okular uses the merge request workflow.
-Merge requests are required to run pre-commit CI jobs; please don’t push to the master branch directly.
-See https://community.kde.org/Infrastructure/GitLab for an introduction.
-
-### Build instructions
-
-Okular can be built like many other applications developed by KDE.
-See https://community.kde.org/Get_Involved/development for an introduction.
-
-If your build environment is set up correctly, you can also build Okular using CMake:
-
-```bash
-git clone https://invent.kde.org/graphics/okular.git
-cd okular
-mkdir build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=/path/to/your/install/dir ..
-make
-make install
-```
-
-Okular also builds tests in the build tree. To run them, you have to run `make install` first.
-
-If you install Okular in a different path than your system install directory it is possible that you need to run
-
-```bash
-source prefix.sh
-```
-
-so that the correct Okular instance and libraries are picked up.
-Afterwards one can run `okular` inside the shell instance.
-The source command is also required to run the tests manually.
-
-As stated above, Okular has various build targets.
-Two of them are executables.
-You can choose which executable to build by passing a flag to CMake:
-
-```bash
-cmake -DCMAKE_INSTALL_PREFIX=/path/to/your/install/dir -DOKULAR_UI=desktop ..
-```
-Available options are `desktop`, `mobile`, and `both`.
-
-### clang-format
-
-The Okular project uses clang-format to enforce source code formatting.
-See [README.clang_format](https://invent.kde.org/graphics/okular/-/blob/master/README.clang-format) for more information.
